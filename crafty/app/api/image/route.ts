@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { increaseApiLimit, checkApiLimit } from "@/lib/api-limit";
+import { checkSubscription } from "@/lib/subscription";
 
 
 const huggingFaceApiKey = process.env.HUGGINGFACE_API_KEY;
@@ -20,8 +21,9 @@ export async function POST(req: Request) {
     }
 
     const freeTrial = await checkApiLimit();
+    const isPro = await checkSubscription();
 
-    if (!freeTrial) {
+    if (!freeTrial && !isPro) {
       return new NextResponse("Free Trial has expired.", { status: 403 });
     }
 
@@ -39,7 +41,9 @@ export async function POST(req: Request) {
       }
     );
 
+    if(!isPro){
     await increaseApiLimit();
+    }
 
 
     if (!response.ok) {

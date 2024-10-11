@@ -14,8 +14,11 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/loader";
 import { EmptyMusic } from "@/components/emptymusic";
+import { useProModal } from "@/hooks/use-pro-modal";
+import toast from "react-hot-toast";
 
 const MusicPage = () => {
+  const proModal = useProModal();
   const router = useRouter();
   const [musicUrl, setMusicUrl] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null); // For download
@@ -51,6 +54,11 @@ const MusicPage = () => {
 
       form.reset();
     } catch (error: any) {
+      if(error?. response?.status === 403 ){
+        proModal.onOpen();
+      } else{
+        toast.error("Something went wrong")
+      }
       console.error("Error generating music:", error);
     } finally {
       router.refresh();

@@ -7,6 +7,7 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { Code2, File, FileVideo2, ImageIcon, LayoutDashboard, MessageCircle, Music2, Settings, Speech, } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { FreeCounter } from './free-counter'
 
 const montserrat = Montserrat({ weight: "600", subsets: ["latin"] });
 
@@ -55,7 +56,15 @@ const routes = [
     },
 ];
 
-const Sidebar = () => {
+interface SidebarProps{
+    apiLimitCount:number;
+    isPro:boolean;
+};
+
+const Sidebar = ({
+    apiLimitCount = 0,
+    isPro = false,
+}:SidebarProps) => {
     
     const pathname = usePathname();
 
@@ -82,15 +91,17 @@ const Sidebar = () => {
                 </div>
             </div>
             <div className='px-3 py-2'>
-                <Link href="/settings" className='text-sm group flex p-3 w-full mt-52
-                justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10
-                rounded-lg transition'>
+                <Link href="/settings" className={isPro ? "text-sm group flex p-3 w-full mt-48 justify-start font-medium cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition" :'text-sm group flex p-3 w-full mt-16 justify-start font-medium cursor-pointer text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition'}>
                     <div className='flex items-center flex-1 '>
                         <Settings className="h-5 w-5 mr-3 text-white" />
                         Settings
                     </div>
                 </Link>
             </div>
+            <FreeCounter
+            isPro = {isPro}
+            apiLimitCount={apiLimitCount}
+            />
         </div>
     )
 }

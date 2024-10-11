@@ -11,8 +11,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/loader";
 import { EmptyMusic } from "@/components/emptymusic";
+import { useProModal } from "@/hooks/use-pro-modal";
 
 const TranscriptionPage = () => {
+  const proModal = useProModal();
   const router = useRouter();
   const [transcription, setTranscription] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -126,6 +128,9 @@ const TranscriptionPage = () => {
 
       formMethods.reset();
     } catch (error: any) {
+      if(error?. response?.status === 403 ){
+        proModal.onOpen();
+      }
       console.error("Error transcribing audio:", error);
     } finally {
       router.refresh();

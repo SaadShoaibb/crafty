@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Groq } from "groq-sdk";
 import { auth } from "@clerk/nextjs/server";
 import { increaseApiLimit, checkApiLimit } from "@/lib/api-limit";
+import { checkSubscription } from "@/lib/subscription";
 
 // Retrieve the API key from the environment
 const apiKey = process.env.GROQ_API_KEY;
@@ -33,8 +34,9 @@ export async function POST(req: Request) {
 
     // Check if the user is still within their API limit (free trial)
     const freeTrial = await checkApiLimit();
+    const isPro = await checkSubscription();
 
-    if (!freeTrial) {
+    if (!freeTrial && !isPro) {
       return new NextResponse("Free Trial has expired.", { status: 403 });
     }
 
@@ -50,7 +52,9 @@ export async function POST(req: Request) {
     });
 
     // Increase the API limit count for the user after a successful request
+    if(!isPro){
     await increaseApiLimit();
+    }
 
     // Extract the generated content from the response
     const result = chatCompletion.choices[0]?.message?.content || "";
